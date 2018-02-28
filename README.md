@@ -1,4 +1,5 @@
-# quill-async-akka-http
+# Quill Async Akka-Http
+
 The Quill Async Akka Http is a very simple json rest api showing one way of using akka http with [quill](https://github.com/getquill/quill) using postgres async.
 
 
@@ -20,23 +21,32 @@ Utils:
 
 The project was thought to be used as an activator template.
 
-#Running
+## Running
 
 You should pre-configure 2 databases on postgres, quill and quilltest, an run the script postgresql-schema.sql to initiate the schema.
-Take a look at application.properties and change the db configuration as you need.
+Take a look at `application.conf` and change the db configuration as you need.
+
+To create and start databases automatically run:
+
+       $ docker-compose up -d 
+
+To run flyway migrations:
+
+       $ sbt migrations/flywayMigrate
+
 After that, just:
 
 
        $ sbt run
 
-#Testing
+## Testing
 
 To run all tests (routes and persistence tests):
 
 
         $ sbt test
 
-#Using
+## Using
 
 	curl --request POST localhost:8080/supplier -H "Content-type: application/json" --data "{\"name\" : \"sup1\",\"desc\" : \"low prices\"}"
 
@@ -46,6 +56,6 @@ or just use swagger:
 
 	http://localhost:8080/swagger/index.html
 
-#Credits
+## Credits
 
 To make this template, I just mixed the tutorials and templates, so credits for akka and quill guys, and swagger-akka-http.
