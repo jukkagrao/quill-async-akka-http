@@ -10,6 +10,7 @@ It supports the following features:
 * Spray-json to parse json
 * Tests for DAL
 * tests for routes
+* Flyway for database migrations 
 
 Utils: 
 
