@@ -33,7 +33,7 @@ class SupplierRoutes(modules: Configuration with PersistenceModule)(implicit ec:
   ))
   def supplierGetRoute = path("supplier" / JavaUUID) { (supId) =>
     get {
-        onComplete((modules.suppliersDal.findById(supId.toString)).mapTo[Option[Supplier]]) {
+        onComplete(modules.suppliersDal.findById(supId).mapTo[Option[Supplier]]) {
           case Success(supplierOpt) => supplierOpt match {
             case Some(sup) => complete(sup.toSimpleSupplier)
             case None => complete(NotFound, s"The supplier doesn't exist")
@@ -55,10 +55,10 @@ class SupplierRoutes(modules: Configuration with PersistenceModule)(implicit ec:
   ))
  def supplierPostRoute = path("supplier") {
     post {
-      entity(as[SimpleSupplier]) { supplierToInsert => onComplete((modules.suppliersDal.insert(supplierToInsert.toSupplier))) {
-        // ignoring the number of insertedEntities because in this case it should always be one, you might check this in other cases
-        case Success(insertedEntities) => complete(Created)
-        case Failure(ex) => complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
+      entity(as[SimpleSupplier]) { supplierToInsert => onComplete(modules.suppliersDal.insert(supplierToInsert.toSupplier)) {
+        case Success(_) => complete(Created)
+        case Failure(ex) => // ex.printStackTrace()
+          complete(InternalServerError, s"An error occurred: ${ex.getMessage}")
       }
       }
     }

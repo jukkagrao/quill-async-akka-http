@@ -7,21 +7,24 @@ import persistence.entities.{SimpleSupplier, Supplier}
 import persistence.JsonProtocol
 import JsonProtocol._
 import SprayJsonSupport._
+import akka.actor.ActorSystem
+
 
 import scala.concurrent.Future
 import akka.http.scaladsl.model.StatusCodes._
 
 class RoutesSpec extends AbstractRestTest {
 
-  def actorRefFactory = system
-  val modules = new Modules {}
+  def actorRefFactory: ActorSystem = system
+
+  val modules: Modules = new Modules {}
   val suppliers = new SupplierRoutes(modules)
-  lazy val generatedId = UUID.randomUUID().toString
+  lazy val generatedId: UUID = UUID.randomUUID()
 
   "Supplier Routes" should {
 
     "return an empty array of suppliers" in {
-     modules.suppliersDal.findById(generatedId) returns Future(None)
+      modules.suppliersDal.findById(generatedId) returns Future(None)
 
       Get(s"/supplier/$generatedId") ~> suppliers.routes ~> check {
         handled shouldEqual true
@@ -30,7 +33,7 @@ class RoutesSpec extends AbstractRestTest {
     }
 
     "return an array with 1 suppliers" in {
-      modules.suppliersDal.findById(generatedId) returns Future(Some(Supplier(generatedId,"name 1", "desc 1")))
+      modules.suppliersDal.findById(generatedId) returns Future(Some(Supplier(generatedId, "name 1", "desc 1")))
       Get(s"/supplier/$generatedId") ~> suppliers.routes ~> check {
         handled shouldEqual true
         status shouldEqual OK
@@ -39,15 +42,15 @@ class RoutesSpec extends AbstractRestTest {
     }
 
     "create a supplier with the json in post" in {
-      modules.suppliersDal.insert(any)(any) returns  Future(1)
-      Post("/supplier",SimpleSupplier("name 1","desc 1")) ~> suppliers.routes ~> check {
+      modules.suppliersDal.insert(any())(any()) returns Future(1)
+      Post("/supplier", SimpleSupplier("name 1", "desc 1")) ~> suppliers.routes ~> check {
         handled shouldEqual true
         status shouldEqual Created
       }
     }
 
     "not handle the invalid json" in {
-      Post("/supplier","{\"name\":\"1\"}") ~> suppliers.routes ~> check {
+      Post("/supplier", "{\"name\":\"1\"}") ~> suppliers.routes ~> check {
         handled shouldEqual false
       }
     }

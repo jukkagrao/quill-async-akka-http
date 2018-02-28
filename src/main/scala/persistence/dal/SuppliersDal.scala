@@ -1,14 +1,16 @@
 package persistence.dal
 
-import persistence.entities.Supplier
-import io.getquill._
+import java.util.UUID
 
-import scala.concurrent.{Awaitable, ExecutionContext, Future}
+import io.getquill._
+import persistence.entities.Supplier
+
+import scala.concurrent.{ExecutionContext, Future}
 
 trait SuppliersDal {
   def insert(supplierToInsert: Supplier)(implicit ec: ExecutionContext): Future[Long]
-  def findById(supId: String)(implicit ec: ExecutionContext) : Future[Option[Supplier]]
-  def delete(supId: String)(implicit ec: ExecutionContext): Future[Long]
+  def findById(supId: UUID)(implicit ec: ExecutionContext) : Future[Option[Supplier]]
+  def delete(supId: UUID)(implicit ec: ExecutionContext): Future[Long]
 }
 
 class SuppliersDalImpl(context: PostgresAsyncContext[SnakeCase]) extends SuppliersDal {
@@ -16,19 +18,22 @@ class SuppliersDalImpl(context: PostgresAsyncContext[SnakeCase]) extends Supplie
   import context._
 
   override def insert(supplierToInsert: Supplier)(implicit ec: ExecutionContext): Future[Long] = {
-    context.run(query[Supplier].insert)(supplierToInsert :: Nil).map(_.head)
+    val q = quote {
+      query[Supplier].insert(lift(supplierToInsert))
+    }
+    context.run(q)
   }
 
-  override def findById(supId: String)(implicit ec: ExecutionContext) : Future[Option[Supplier]] = {
+  override def findById(supId: UUID)(implicit ec: ExecutionContext) : Future[Option[Supplier]] = {
     val q = quote {
-      query[Supplier].filter(s => s.id == lift(supId))
+      query[Supplier].filter(_.id == lift(supId))
     }
     context.run(q).map(_.headOption)
   }
 
-  override def delete(supId: String)(implicit ec: ExecutionContext): Future[Long] = {
+  override def delete(supId: UUID)(implicit ec: ExecutionContext): Future[Long] = {
     val q = quote {
-      query[Supplier].filter(s => s.id == lift(supId)).delete
+      query[Supplier].filter(_.id == lift(supId)).delete
     }
     context.run(q)
   }

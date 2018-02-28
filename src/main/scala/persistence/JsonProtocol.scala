@@ -1,8 +1,8 @@
 package persistence
 
 import persistence.entities.SimpleSupplier
-import spray.json.DefaultJsonProtocol
+import spray.json.{DefaultJsonProtocol, RootJsonFormat}
 
 object JsonProtocol extends DefaultJsonProtocol {
-  implicit val supplierFormat = jsonFormat2(SimpleSupplier)
+  implicit val supplierFormat: RootJsonFormat[SimpleSupplier] = jsonFormat2(SimpleSupplier)
 }

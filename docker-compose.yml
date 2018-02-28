@@ -1,0 +1,11 @@
+version: '3.1'
+services:
+  database:
+    build: docker/postgres
+    restart: always
+    environment:
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      POSTGRES_DB: "quill"
+    ports:
+      - "5432:5432"
